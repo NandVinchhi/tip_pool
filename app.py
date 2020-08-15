@@ -2,6 +2,17 @@ from pymongo import MongoClient
 from pymongo.collection import ObjectId
 import bcrypt
 import uuid
+from flask import Flask, request
+app = Flask(__name__)
+
+import json
+from bson import ObjectId
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 client = MongoClient("mongodb+srv://user:password3142@cluster0.dyrpk.azure.mongodb.net/<dbname>?retryWrites=true&w=majority")
 
@@ -34,7 +45,10 @@ def login_employee(email, password):
         return {"status":"failed"}
 
 def get_employee_info(email):
-    return db.employees.find_one({"email":email})
+    k = db.employees.find_one({"email":email})
+    k["_id"] = str(k["_id"])
+    k["password"] = str(k["password"])
+    return k
 
 def register_admin(email, password, username, restaurant_name, yelp_link, bank_number):
     if db.managers.find_one({"email":email}) == None and db.managers.find_one({"username":username}) == None: 
@@ -62,7 +76,10 @@ def login_admin(email, password):
         return {"status":"failed"}
 
 def get_admin_info(email):
-    return db.managers.find_one({"email":email})
+    k = db.managers.find_one({"email":email})
+    k["_id"] = str(k["_id"])
+    k["password"] = str(k["password"])
+    return k
 
 #print(register_admin("nand.vinchhi@gmail.com", "password6969", "Nand Vinchhi", "Taco Bell", "google.com", "123455"))
 #print(get_admin_info("nand.vinchhi@gmail.com"))
@@ -95,51 +112,106 @@ def delete_employee(manager_email, employee_email):
 #print(add_employee("nand.vinchhi@gmail.com", "nand.vinchhi@gmail.com"))
 
 def distribute(employees, tip, bill, speed, cleanliness, food, service):
-    a = []
-    b = []
-    c = []
-    d = []
+    try:
+        a = []
+        b = []
+        c = []
+        d = []
 
-    aa = 0.15 * tip
-    bb = 0.15 * tip
-    cc = 0.15 * tip
-    dd = 0.15 * tip
+        aa = 0.15 * tip
+        bb = 0.15 * tip
+        cc = 0.15 * tip
+        dd = 0.15 * tip
 
-    for i in employees:
-        role = get_employee_info(i)["role"]
-        if role == "food":
-            a.append(i)
-            c.append(i)
-        elif role == "service":
-            a.append(i)
-            d.append(i)
-        else:
-            b.append(i)
+        for i in employees:
+            role = get_employee_info(i)["role"]
+            if role == "food":
+                a.append(i)
+                c.append(i)
+            elif role == "service":
+                a.append(i)
+                d.append(i)
+            else:
+                b.append(i)
 
-    aa += 0.4 * tip * (speed/(speed + cleanliness + food + service))
-    bb += 0.4 * tip * (cleanliness/(speed + cleanliness + food + service))
-    cc += 0.4 * tip * (food/(speed + cleanliness + food + service))
-    dd += 0.4 * tip * (service/(speed + cleanliness + food + service))
+        aa += 0.4 * tip * (speed/(speed + cleanliness + food + service))
+        bb += 0.4 * tip * (cleanliness/(speed + cleanliness + food + service))
+        cc += 0.4 * tip * (food/(speed + cleanliness + food + service))
+        dd += 0.4 * tip * (service/(speed + cleanliness + food + service))
 
-    aa /= len(a)
-    bb /= len(b)
-    cc /= len(c)
-    dd /= len(d)
+        aa /= len(a)
+        bb /= len(b)
+        cc /= len(c)
+        dd /= len(d)
 
-    for i in a:
-        db.employees.update_one({"email":i}, {"$inc": {"balance":aa}})
-    for i in b:
-        db.employees.update_one({"email":i}, {"$inc": {"balance":bb}})
-    for i in c:
-        db.employees.update_one({"email":i}, {"$inc": {"balance":cc}})
-    for i in d:
-        db.employees.update_one({"email":i}, {"$inc": {"balance":dd}})
+        for i in a:
+            db.employees.update_one({"email":i}, {"$inc": {"balance":aa}})
+        for i in b:
+            db.employees.update_one({"email":i}, {"$inc": {"balance":bb}})
+        for i in c:
+            db.employees.update_one({"email":i}, {"$inc": {"balance":cc}})
+        for i in d:
+            db.employees.update_one({"email":i}, {"$inc": {"balance":dd}})
 
-    final_k = {"order_id":uuid.uuid1(), "employees":employees, "bill_amount":bill, "tip_amount":tip, "speed":speed, "cleanliness":cleanliness, "food":food, "service":service}
-    db.orders.insert_one(final_k)
+        final_k = {"order_id":uuid.uuid1(), "employees":employees, "bill_amount":bill, "tip_amount":tip, "speed":speed, "cleanliness":cleanliness, "food":food, "service":service}
+        db.orders.insert_one(final_k)
+        return {"status":"success"}
 
+    except:
+        return {"status":"failed"}
 
-print(register_employee("nand.vinchhi1@gmail.com", "password6969", "food", "Nand Vinchhi", "123456"))
-print(register_employee("nand.vinchhi2@gmail.com", "password6969", "service", "Veer Gadodia", "123456"))
-print(register_employee("nand.vinchhi3@gmail.com", "password6969", "cleanliness", "Muntaser Syed", "123456"))
-distribute(["nand.vinchhi1@gmail.com", "nand.vinchhi2@gmail.com", "nand.vinchhi3@gmail.com"], 100, 1000, 5, 5, 5, 5)
+@app.route('/register-employee', methods=["GET", "POST"])
+def register_employee_endpoint():
+    data = request.json
+
+    return register_employee(data["email"], data["password"], data["role"], data["name"], data["bank_number"])
+
+@app.route('/login-employee', methods=["GET", "POST"])
+def login_employee_endpoint():
+    data = request.json
+
+    return login_employee(data["email"], data["password"])
+
+@app.route('/get-employee-info', methods=["GET", "POST"])
+def get_employee_info_endpoint():
+    data = request.json
+
+    return JSONEncoder().encode(get_employee_info(data["email"]))
+@app.route('/register-admin', methods=["GET", "POST"])
+def register_admin_endpoint():
+    data = request.json
+
+    return register_admin(data["email"], data["password"], data["username"], data["restaurant_name"], data["yelp_link"], data["bank_number"])
+
+@app.route('/login-admin', methods=["GET", "POST"])
+def login_admin_endpoint():
+    data = request.json
+
+    return login_admin(data["email"], data["password"])
+
+@app.route('/get-admin-info', methods=["GET", "POST"])
+def get_admin_info_endpoint():
+    data = request.json
+
+    return get_admin_info(data["email"])
+
+@app.route('/add-employee', methods=["GET", "POST"])
+def add_employee_endpoint():
+    data = request.json
+
+    return add_employee(data["manager_email"], data["employee_email"])
+
+@app.route('/delete-employee', methods=["GET", "POST"])
+def delete_employee_endpoint():
+    data = request.json
+
+    return delete_employee(data["manager_email"], data["employee_email"])
+
+@app.route('/distribute', methods=["GET", "POST"])
+def distribute_endpoint():
+    data = request.json
+
+    return distribute(data["employees"], data["tip"], data["bill"], data["speed"], data["cleanliness"], data["food"], data["service"])
+
+if __name__ == "__main__":
+    app.run()
