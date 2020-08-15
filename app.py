@@ -16,7 +16,7 @@ class JSONEncoder(json.JSONEncoder):
 
 client = MongoClient("mongodb+srv://user:password3142@cluster0.dyrpk.azure.mongodb.net/<dbname>?retryWrites=true&w=majority")
 
-db = client.get_database("users")
+db = client.get_database("tippanda")
 
 def register_employee(email, password, name):
     
@@ -60,7 +60,7 @@ def get_employee_info(email):
     return k
 
 def register_admin(email, password, username, restaurant_name, address):
-    if db.managers.find_one({"email":email}) == None and db.managers.find_one({"username":username}) == None: 
+    if db.managers.find_one({"email":email}) == None: 
         hashp = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         restaurant_id = str(uuid.uuid1())
         k = {"restaurant_id":restaurant_id, "email":email, "password":hashp, "username":username, "employees":[], "restuarant_name":restaurant_name, "personal_loan_balance":float(0), "personal_balamce":float(0), "tip_jar":float(0), "loan_balance":float(0), "address":address, "bank_number":""}
