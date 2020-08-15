@@ -63,7 +63,7 @@ def register_admin(email, password, username, restaurant_name, address):
     if db.managers.find_one({"email":email}) == None: 
         hashp = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         restaurant_id = str(uuid.uuid1())
-        k = {"restaurant_id":restaurant_id, "email":email, "password":hashp, "username":username, "employees":[], "restuarant_name":restaurant_name, "personal_loan_balance":float(0), "personal_balamce":float(0), "tip_jar":float(0), "loan_balance":float(0), "address":address, "bank_number":""}
+        k = {"restaurant_id":restaurant_id, "email":email, "password":hashp, "username":username, "employees":[], "restuarant_name":restaurant_name, "personal_loan_balance":float(0), "personal_balance":float(0), "tip_jar":float(0), "loan_balance":float(0), "address":address, "bank_number":""}
         db.managers.insert_one(k)
         return {"status":"success"}
     else:
@@ -125,7 +125,80 @@ def delete_employee(manager_email, employee_email):
         return {"status":"success"}
     else:
         return {"status":"failed"}
+
+def create_loan(userid, amount, start_month, start_date, start_year, end_month, end_date, end_year, interest_rate):
+    loan_id = str(uuid.uuid1())
+
+    k = {"loan_id":loan_id, "userid":userid, "amount":float(amount), "start_month":start_month, "start_date":start_date, "start_year":start_year, "end_month":end_month, "end_date":end_date, "end_year":end_year, "interest_rate":interest_rate, "votes":[], "vote_amounts":[], "accepted_amount":float(0)}  
+    db.loans.insert_one(k)
+    return {"status":"success"}
     
+
+def vote(userid, loan_id):
+    loan = db.loans.find_one({"loan_id":loan_id})
+    a = db.employees.find_one({"userid":userid})
+    if a == None:
+        
+        a = db.managers.find_one({"restaurant_id":userid})
+        print(a)
+        k = float(a["personal_balance"] * loan["amount"] / a["tip_jar"])
+        db.employees.update_one({"userid":loan["userid"]}, {"$inc":{"balance":k}})
+        db.managers.update_one({"restaurant_id":a["restaurant_id"]}, {"$inc":{"personal_balance": (-1 * k)}})
+        xa = loan["votes"]
+        xb = loan["vote_amounts"]
+        xa.append(a["restaurant_id"])
+        xb.append(k)
+
+        db.loans.update_one({"loan_id":loan_id}, {"$set":{"votes":xa}})
+        db.loans.update_one({"loan_id":loan_id}, {"$set":{"vote_amounts":xb}})
+
+    else:
+        b = db.employees.find_one({"userid":loan["userid"]})
+        if b == None:
+            b = db.managers.find_one({"restaurant_id":loan["userid"]})
+            k = float(a["balance"] * loan["amount"] / b["tip_jar"])
+            db.managers.update_one({"restaurant_id":loan["userid"]}, {"$inc":{"personal_balance":k}})
+            db.employees.update_one({"userid":a["userid"]}, {"$inc":{"balance": (-1 * k)}})
+            xa = loan["votes"]
+            xb = loan["vote_amounts"]
+            xa.append(a["userid"])
+            xb.append(k)
+
+            db.loans.update_one({"loan_id":loan_id}, {"$set":{"votes":xa}})
+            db.loans.update_one({"loan_id":loan_id}, {"$set":{"vote_amounts":xb}})
+        else:
+            c = db.managers.find_one({"restaurant_id":a["restaurant_id"]})
+            k = float(a["balance"] * loan["amount"] / c["tip_jar"])
+            db.employees.update_one({"userid":b["userid"]}, {"$inc":{"balance":k}})
+            db.employees.update_one({"userid":a["userid"]}, {"$inc":{"balance":(-1 * k)}})
+            xa = loan["votes"]
+            xb = loan["vote_amounts"]
+            xa.append(a["userid"])
+            xb.append(k)
+
+            db.loans.update_one({"loan_id":loan_id}, {"$set":{"votes":xa}})
+            db.loans.update_one({"loan_id":loan_id}, {"$set":{"vote_amounts":xb}})
+    return {"status":"success"}
+        
+def increment(userid, amount):
+    a = db.employees.find_one({"userid":userid})
+    if a == None:
+        db.managers.update_one({"restaurant_id":userid}, {"$inc":{"personal_balance":amount}})
+    else:
+        db.employees.update_one({"userid":userid}, {"$inc":{"balance":amount}})
+
+    return {"status":"success"}
+
+def payoff(loan_id):
+    loan = db.loans.find_one({"loan_id":loan_id})
+
+    for i in range(0, len(loan["votes"])):
+        increment(loan["votes"][i], loan["vote_amounts"][i])
+        increment(loan["userid"], -1 * loan["vote_amounts"][i])
+
+    db.loans.delete_one({"loan_id":loan_id})
+    return {"status":"success"}
+
 #print(delete_employee("nand.vinchhi@gmail.com", "nand.vinchhi@gmail.com"))
 #print(add_employee("nand.vinchhi@gmail.com", "nand.vinchhi@gmail.com"))
 
@@ -244,6 +317,23 @@ def distribute_endpoint():
     data = request.json
 
     return distribute(data["employees"], data["tip"], data["bill"], data["speed"], data["cleanliness"], data["food"], data["service"])
+
+@app.route('/create-loan', methods=["GET", "POST"])
+def create_loan_endpoint():
+    data = request.json
+
+    return create_loan(data["userid"], data["amount"], data["start_month"], data["start_date"], data["start_year"], data["end_month"], data["end_date"], data["end_year"], data["interest_rate"])
+
+@app.route('/vote-loan', methods=["GET", "POST"])
+def vote_loan_endpoint():
+    data = request.json
+    return vote(data["userid"], data["loan_id"])
+
+@app.route('/create-loan', methods=["GET", "POST"])
+def create_loan_endpoint():
+    data = request.json
+    return payoff(data["loan_id"])
+
 
 if __name__ == "__main__":
     app.run()
