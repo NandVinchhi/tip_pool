@@ -18,12 +18,12 @@ client = MongoClient("mongodb+srv://user:password3142@cluster0.dyrpk.azure.mongo
 
 db = client.get_database("users")
 
-def register_employee(email, password, role, name, bank_number):
+def register_employee(email, password, name):
     
     if db.employees.find_one({"email":email}) == None:
         hashp = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         userid = str(uuid.uuid1())
-        k = {"name":name, "email":email, "password":hashp, "restaurant_id":"0", "balance":float(0), "role":role, "userid":userid, "loan_amount":float(0), "bank_number":bank_number}
+        k = {"name":name, "email":email, "password":hashp, "restaurant_id":"0", "balance":float(0), "role":"", "userid":userid, "loan_amount":float(0), "bank_number":""}
         db.employees.insert_one(k)
         return {"status":"success"}
     else:
@@ -44,17 +44,26 @@ def login_employee(email, password):
     else:
         return {"status":"failed"}
 
+
+def update_bank_details_employee(email, password, bank_number):
+    if login_employee(email, password)["status"] == "success":
+        db.employees.update_one({"email":email},{"$set":{"bank_number":bank_number}})
+        return {"status":"success"}
+    else:
+        return {"status":"failed"}
+
+
 def get_employee_info(email):
     k = db.employees.find_one({"email":email})
     k["_id"] = str(k["_id"])
     k["password"] = str(k["password"])
     return k
 
-def register_admin(email, password, username, restaurant_name, yelp_link, bank_number):
+def register_admin(email, password, username, restaurant_name, address):
     if db.managers.find_one({"email":email}) == None and db.managers.find_one({"username":username}) == None: 
         hashp = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         restaurant_id = str(uuid.uuid1())
-        k = {"restaurant_id":restaurant_id, "email":email, "password":hashp, "username":username, "employees":[], "restuarant_name":restaurant_name, "personal_loan_balance":float(0), "personal_balamce":float(0), "tip_jar":float(0), "loan_balance":float(0), "yelp_link":yelp_link, "bank_number":bank_number}
+        k = {"restaurant_id":restaurant_id, "email":email, "password":hashp, "username":username, "employees":[], "restuarant_name":restaurant_name, "personal_loan_balance":float(0), "personal_balamce":float(0), "tip_jar":float(0), "loan_balance":float(0), "address":address, "bank_number":""}
         db.managers.insert_one(k)
         return {"status":"success"}
     else:
@@ -75,6 +84,13 @@ def login_admin(email, password):
     else:
         return {"status":"failed"}
 
+def update_bank_details_admin(email, password, bank_number):
+    if login_admin(email, password)["status"] == "success":
+        db.managers.update_one({"email":email},{"$set":{"bank_number":bank_number}})
+        return {"status":"success"}
+    else:
+        return {"status":"failed"}
+
 def get_admin_info(email):
     k = db.managers.find_one({"email":email})
     k["_id"] = str(k["_id"])
@@ -86,13 +102,14 @@ def get_admin_info(email):
 #print(register_employee("nand.vinchhi@gmail.com", "password6969", "chef", "Nand Vinchhi", "123456"))
 #print(get_employee_info("nand.vinchhi@gmail.com"))
 
-def add_employee(manager_email, employee_email):
+def add_employee(manager_email, employee_email, role):
     k = db.managers.find_one({"email":manager_email})
     x = k["employees"]
     if employee_email not in x and db.employees.find_one({"email":employee_email}) != None:
         x.append(employee_email)
         db.managers.update_one({"email":manager_email},{"$set":{"employees":x}})
         db.employees.update_one({"email":employee_email}, {"$set": {"restaurant_id":k["restaurant_id"]}})
+        db.employees.update_one({"email":employee_email}, {"$set": {"role":role}})
         return {"status":"success"}
     else:
         return {"status":"failed"}
@@ -104,6 +121,7 @@ def delete_employee(manager_email, employee_email):
         x.remove(employee_email)
         db.managers.update_one({"email":manager_email},{"$set":{"employees":x}})
         db.employees.update_one({"email":employee_email}, {"$set": {"restaurant_id":"0"}})
+        db.employees.update_one({"email":employee_email}, {"$set": {"role":""}})
         return {"status":"success"}
     else:
         return {"status":"failed"}
@@ -164,7 +182,7 @@ def distribute(employees, tip, bill, speed, cleanliness, food, service):
 def register_employee_endpoint():
     data = request.json
 
-    return register_employee(data["email"], data["password"], data["role"], data["name"], data["bank_number"])
+    return register_employee(data["email"], data["password"], data["name"])
 
 @app.route('/login-employee', methods=["GET", "POST"])
 def login_employee_endpoint():
@@ -177,11 +195,18 @@ def get_employee_info_endpoint():
     data = request.json
 
     return JSONEncoder().encode(get_employee_info(data["email"]))
+
+@app.route('/update-bank-employee', methods=["GET", "POST"])
+def update_bank_employee_endpoint():
+    data = request.json
+
+    return update_bank_details_employee(data["email"], data["password"], data["bank_number"])
+
 @app.route('/register-admin', methods=["GET", "POST"])
 def register_admin_endpoint():
     data = request.json
 
-    return register_admin(data["email"], data["password"], data["username"], data["restaurant_name"], data["yelp_link"], data["bank_number"])
+    return register_admin(data["email"], data["password"], data["username"], data["restaurant_name"], data["address"])
 
 @app.route('/login-admin', methods=["GET", "POST"])
 def login_admin_endpoint():
@@ -195,11 +220,18 @@ def get_admin_info_endpoint():
 
     return get_admin_info(data["email"])
 
+@app.route('/update-bank-admin', methods=["GET", "POST"])
+def update_bank_admin_endpoint():
+    data = request.json
+
+    return update_bank_details_admin(data["email"], data["password"], data["bank_number"])
+
+
 @app.route('/add-employee', methods=["GET", "POST"])
 def add_employee_endpoint():
     data = request.json
 
-    return add_employee(data["manager_email"], data["employee_email"])
+    return add_employee(data["manager_email"], data["employee_email"], data["role"])
 
 @app.route('/delete-employee', methods=["GET", "POST"])
 def delete_employee_endpoint():
