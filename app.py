@@ -329,7 +329,7 @@ def vote_loan_endpoint():
     data = request.json
     return vote(data["userid"], data["loan_id"])
 
-@app.route('/create-loan', methods=["GET", "POST"])
+@app.route('/payoff-loan', methods=["GET", "POST"])
 def create_loan_endpoint():
     data = request.json
     return payoff(data["loan_id"])
