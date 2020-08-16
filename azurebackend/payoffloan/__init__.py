@@ -15,7 +15,7 @@ class JSONEncoder(json.JSONEncoder):
 
 def initdb():
 
-    client = MongoClient("mongodb+srv://user:password3142@cluster0.dyrpk.azure.mongodb.net/<dbname>?retryWrites=true&w=majority")
+    client = MongoClient("mongodb+srv://user:getownpassword@cluster0.dyrpk.azure.mongodb.net/<dbname>?retryWrites=true&w=majority")
 
     db = client.get_database("tippanda")
 
