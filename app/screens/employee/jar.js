@@ -25,6 +25,25 @@ export default class Jar extends React.Component  {
     componentDidMount() {
       this._loadFontsAsync();
     }
+
+    getData(){
+        fetch('https://tippanda.azurewebsites.net/api/employeeinfo', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body:  {"email" : "nand.vinchhi@gmail.com", "password": "1234"}
+    })
+        .then((response) => response.json())
+        .then((responseJson) => {
+    console.log(responseJson);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
+    
+    
   
     render(){
         if (this.state.fontsLoaded) {

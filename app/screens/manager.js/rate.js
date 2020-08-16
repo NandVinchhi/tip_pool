@@ -32,19 +32,22 @@ export default class Rate extends React.Component  {
   }
 
   getData() {
-    return  [
-    {
-      
-    name:"Wreckfish",
-    
-  },
-  {
-    
-    name:"Atlantic wahoo",
-    
-  },
-  ]
+    fetch('https://tippanda.azurewebsites.net/api/distributetip', {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json',
+          },
+          body: {"employees" : ["cook@gmail.com", "waiter@gmail.com", "cleaner@gmail.com"], "bill" : "172.75" , "tip" : "31.75", "speed" : this.state.wt , "cleanliness" : this.state.clean , "food" : this.state.food, "service" : this.state.service}
+  })
+      .then((response) => response.json())
+      .then((responseJson) => {
+  console.log(responseJson);
+      })
+      .catch((error) => {
+          console.error(error);
+      });
   }
+  
 
   render(){
     if (this.state.fontsLoaded) {
@@ -91,7 +94,7 @@ export default class Rate extends React.Component  {
             <Text style={styles.h1}>Tip Amount</Text>
             <TextInput placeholder='Amount' style={{position:'relative',fontSize:20,margin:'auto', paddingLeft:'5%', color:'#798497', fontFamily:'Gadugi', marginTop:'1%', backgroundColor:'#EAEAEA',padding:'2.5%', width:'40%', borderRadius:5,alignSelf:'center'}}></TextInput>
             
-            <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'15%', backgroundColor:'#FCBE1F', padding:'5%', width:'70%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.props.navigation.navigate('EQRCode')}>Pay</Text>
+            <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'15%', backgroundColor:'#FCBE1F', padding:'5%', width:'70%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.getData()}>Pay</Text>
       </View>
    
       
