@@ -16,6 +16,7 @@ import Request from './screens/employee/request';
 import Loans from './screens/employee/loans';
 import Vote from './screens/employee/vote';
 import Rate from './screens/manager.js/rate';
+import Scan from './screens/manager.js/scan';
 
 
 
@@ -82,6 +83,11 @@ function MyStack() {
        <Stack.Screen 
         name="Rate" 
         component={Rate} 
+        options={{ headerShown: false}} 
+      />
+      <Stack.Screen 
+        name="Scan" 
+        component={Scan} 
         options={{ headerShown: false}} 
       />
      

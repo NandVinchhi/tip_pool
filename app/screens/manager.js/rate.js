@@ -16,6 +16,10 @@ let customFonts  = {
 export default class Rate extends React.Component  {
   state = {
     fontsLoaded: false,
+    food:0,
+    service:0,
+    wt:0,
+    clean:0,
   };
 
   async _loadFontsAsync() {
@@ -47,22 +51,51 @@ export default class Rate extends React.Component  {
     return (
     <View style={styles.container}>
       <Text style={{position:'relative',fontSize:20,margin:'auto', textAlign:'center', color:'#2D3748', fontFamily:'Avenir', marginTop:'10%'}}>Rate Your Experience</Text>
-      <Text style={{position:'relative',fontSize:20,margin:'auto', textAlign:'center', color:'#2D3748', fontFamily:'Gadugi', marginTop:'10%'}}>Help tip each employee fairly</Text>
-      <View style={{backgroundColor:'#FFFFFF', height:'70%',width:'80%', elevation:1, position:'absolute', zIndex:4, top:'10%', alignSelf:'center', borderRadius:10}}>
-            <Text style={styles.h1}>Amount</Text>
+      
+      <Text style={{position:'relative',fontSize:20,margin:'auto', textAlign:'center', color:'#2D3748', fontFamily:'Gadugi', marginTop:'5%'}}>Help tip each employee fairly</Text>
+     
+      
+      
+      <Text style={{position:'relative',fontSize:20,margin:'auto', textAlign:'center', color:'#2D3748', fontFamily:'Avenir', marginTop:'10%'}}>Food Quality</Text>
+      <View style={{flex:1, flexDirection:'row', alignSelf:'center', marginTop:'5%'}}><Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, marginRight:'2%',alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({food:1})}>1</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'2%', marginRight:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({food:2})}>2</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'2%', marginRight:'2%',backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({food:3})}>3</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'2%', marginRight:'2%',backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({food:4})}>4</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'2%', marginRight:'2%',backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({food:5})}>5</Text></View>
+      
+      <Text style={{position:'relative',fontSize:20,margin:'auto', textAlign:'center', color:'#2D3748', fontFamily:'Avenir', marginTop:'10%'}}>Service</Text>
+      <View style={{flex:1, flexDirection:'row', alignSelf:'center', marginTop:'5%'}}><Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center',marginRight:'2%', elevation:1}} onPress={()=>this.state.setState({service:1})}>1</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({service:2})}>2</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({service:3})}>3</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({service:4})}>4</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({service:5})}>5</Text></View>
+      <Text style={{position:'relative',fontSize:20,margin:'auto', textAlign:'center', color:'#2D3748', fontFamily:'Avenir', marginTop:'10%'}}>Waiting Time</Text>
+      <View style={{flex:1, flexDirection:'row', alignSelf:'center', marginTop:'5%'}}><Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', marginRight:'2%',elevation:1}} onPress={()=>this.state.setState({wt:1})}>1</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({wt:2})}>2</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({wt:3})}>3</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({wt:4})}>4</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({wt:5})}>5</Text></View>
+      <Text style={{position:'relative',fontSize:20,margin:'auto', textAlign:'center', color:'#2D3748', fontFamily:'Avenir', marginTop:'10%'}}>Cleanliness</Text>
+      <View style={{flex:1, flexDirection:'row', alignSelf:'center', marginTop:'5%'}}><Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', marginRight:'2%',elevation:1}} onPress={()=>this.state.setState({clean:1})}>1</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({clean:2})}>2</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({clean:3})}>3</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({clean:4})}>4</Text>
+      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', marginRight:'2%',fontFamily:'GadugiB', marginTop:'2%', backgroundColor:'#FCBE1F', padding:'3%', width:'10%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.state.setState({clean:5})}>5</Text></View>
+
+      <Text style={{position:'relative',fontSize:10,margin:'auto', textAlign:'center', color:'#2D3748', fontFamily:'Gadugi', marginTop:'10%'}}>   If no ratings given, tip will be given based on previous customer ratings</Text>
+   
+   
+     
+     
+      <View style={{backgroundColor:'#FFFFFF', height:'30%',width:'80%', elevation:1, position:'absolute', zIndex:4, top:'65%', alignSelf:'center', borderRadius:10}}>
+            <Text style={styles.h1}>Tip Amount</Text>
             <TextInput placeholder='Amount' style={{position:'relative',fontSize:20,margin:'auto', paddingLeft:'5%', color:'#798497', fontFamily:'Gadugi', marginTop:'1%', backgroundColor:'#EAEAEA',padding:'2.5%', width:'40%', borderRadius:5,alignSelf:'center'}}></TextInput>
-            <Text style={styles.h1}>Date of Return</Text>
-            <TextInput placeholder='Date of Return' style={{position:'relative',fontSize:20,margin:'auto', paddingLeft:'5%', color:'#798497', fontFamily:'Gadugi', marginTop:'1%', backgroundColor:'#EAEAEA',padding:'2.5%', width:'50%', borderRadius:5,alignSelf:'center'}}></TextInput>
-            <Text style={styles.h1}>Reason</Text>
-            <TextInput placeholder='Reason' style={{position:'relative',fontSize:20,margin:'auto', paddingLeft:'5%', color:'#798497', fontFamily:'Gadugi', marginTop:'1%', backgroundColor:'#EAEAEA',padding:'2.5%', width:'70%',height:'30%', borderRadius:5,alignSelf:'center'}}></TextInput>
-            <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'15%', backgroundColor:'#FCBE1F', padding:'5%', width:'70%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.props.navigation.navigate('EQRCode')}>Request</Text>
+            
+            <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'15%', backgroundColor:'#FCBE1F', padding:'5%', width:'70%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.props.navigation.navigate('EQRCode')}>Pay</Text>
       </View>
-     
-     
-     
    
       
-      <Text style={{position:'relative',fontSize:20, textAlign:'center', color:'#FFF', fontFamily:'GadugiB', marginTop:'15%', backgroundColor:'#FCBE1F', padding:'5%', width:'70%', borderRadius:10, alignSelf:'center', elevation:1}} onPress={()=>this.props.navigation.navigate('EQRCode')}>Get QR COde</Text>
+      
        <View style={{marginBottom:'10%', marginTop:'140%'}}><Footer ></Footer></View>
     </View>
     );
@@ -88,7 +121,7 @@ const styles = StyleSheet.create({
   },
   h1:{
     fontSize:20,
-    fontFamily:'Gadugi',
+    fontFamily:'GadugiB',
     position:'relative',
     zIndex:2,
     marginTop:'5%',
